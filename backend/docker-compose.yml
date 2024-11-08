@@ -7,6 +7,7 @@ services:
       - mongo-data:/data/db
     ports:
       - "27017:27017"
+  
   authservice:
     build: ./authservice
     container_name: authservice_c
@@ -21,6 +22,7 @@ services:
       - ./authservice/.env
     environment:
       - MONGO_URL=mongodb://mongo_c:27017/mydb
+  
   courseservice:
     build: ./courseservice
     container_name: courseservice_c
@@ -35,6 +37,7 @@ services:
       - /app/node_modules
     environment:
       - MONGO_URL=mongodb://mongo_c:27017/mydb
+
   paymentservice:
     build: ./paymentservice
     container_name: paymentservice_c
@@ -49,6 +52,7 @@ services:
       - /app/node_modules
     environment:
       - MONGO_URL=mongodb://mongo_c:27017/mydb
+  
   notificationservice:
     build: ./notificationservice
     container_name: notificationservice_c
@@ -63,6 +67,7 @@ services:
       - /app/node_modules
     environment:
       - MONGO_URL=mongodb://mongo_c:27017/mydb
+  
   gateway:
     build: ./gateway
     container_name: gateway_c
@@ -70,6 +75,7 @@ services:
       - "5000:5000"
     depends_on:
       - mongo
+      # Remove or add this if `api` is defined
       - api
     env_file:
       - ./gateway/.env
@@ -82,6 +88,7 @@ services:
       - /app/node_modules
     environment:
       - MONGO_URL=mongodb://mongo_c:27017/mydb
+  
   nginx-proxy:
     build:
       dockerfile: Dockerfile
@@ -92,7 +99,18 @@ services:
       - notificationservice
       - paymentservice
     ports:
-      - 50:50
+      - "80:80"
+
+  # Define the `api` service if needed
+  api:
+    build: ./api
+    container_name: api_c
+    ports:
+      - "5005:5005"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo_c:27017/mydb
+  
 volumes:
   mongo-data:
-    
